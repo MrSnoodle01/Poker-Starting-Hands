@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { db } from '../db/database';
+import { getHandFrequencies } from '../utils/storage';
 
 type Props = {
     selectedDate: string | null;
@@ -9,28 +9,21 @@ type Props = {
 export default function HandStatsGraph({ selectedDate }: Props) {
     const [handFrequencies, setHandFrequencies] = useState<Record<string, number> | null>(null);
     useEffect(() => {
-        const rows = db.getAllSync(
-            `SELECT hand, COUNT(*) as count
-            FROM hands
-            WHERE date = ?
-            GROUP BY hand`,
-            [selectedDate]
-        );
+        const fetchData = async () => {
+            if (selectedDate) {
+                const freq = await getHandFrequencies(selectedDate);
+                setHandFrequencies(freq);
+            }
+        }
 
-        const map: Record<string, number> = {};
-
-        rows.forEach((row: any) => {
-            map[row.hand] = row.count
-        })
-        console.log(map);
-        setHandFrequencies(map)
+        fetchData();
     }, [])
 
     const getHandColor = (hand: string) => {
         if (!handFrequencies) return;
 
         const count = handFrequencies[hand];
-        console.log(count);
+
         if (count === 0 || count === undefined) return '#686868'; // never got hand
 
         const max = Math.max(...Object.values(handFrequencies));

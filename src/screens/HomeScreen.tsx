@@ -5,13 +5,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { DateTimePickerEvent } from "@react-native-community/datetimepicker"
-import { db } from "../db/database";
+import { saveHand } from "../utils/storage";
 
 export default function HomeScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [selectedHand, setSelectedHand] = useState<string | null>(null);
     const [showStatsGraph, setShowStatsGraph] = useState(false);
+
+    const isoDate = selectedDate.toISOString().split('T')[0];
 
     const onChange = (event: DateTimePickerEvent, date?: Date) => {
         setShowPicker(false);
@@ -21,22 +23,11 @@ export default function HomeScreen() {
         }
     }
 
-    const handleSubmitHand = () => {
+    const handleSubmitHand = async () => {
         if (!selectedHand) return;
 
-        const isoDate = selectedDate.toISOString().split('T')[0];
-
-        db.runSync(
-            `INSERT INTO hands (hand, date) VALUES (?, ?)`,
-            [selectedHand, isoDate]
-        );
-
+        await saveHand(selectedHand, isoDate);
         setSelectedHand(null);
-    }
-
-    const printHands = () => {
-        const rows = db.getAllSync(`SELECT * FROM hands`);
-        console.log(rows);
     }
 
     return (

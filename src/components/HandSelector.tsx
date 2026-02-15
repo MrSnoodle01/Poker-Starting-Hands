@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     },
     buttonFlex: {
         width: `${100 / 13.5}%`,
-        height: `${100 / 13}%`,
+        height: `${100 / 8.5}%`,
         justifyContent: 'center',
         alignItems: 'center',
         marginVertical: 5,

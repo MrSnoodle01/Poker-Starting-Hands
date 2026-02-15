@@ -3,25 +3,14 @@ import HandStatsGraph from "../components/HandStatsGraph";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
-import DateTimePicker from "@react-native-community/datetimepicker"
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker"
 import { saveHand } from "../utils/storage";
 
 export default function HomeScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [showPicker, setShowPicker] = useState(false);
     const [selectedHand, setSelectedHand] = useState<string | null>(null);
     const [showStatsGraph, setShowStatsGraph] = useState(false);
 
     const isoDate = selectedDate.toISOString().split('T')[0];
-
-    const onChange = (event: DateTimePickerEvent, date?: Date) => {
-        setShowPicker(false);
-
-        if (event.type === 'set' && date) {
-            setSelectedDate(date);
-        }
-    }
 
     const handleSubmitHand = async () => {
         if (!selectedHand) return;
@@ -49,12 +38,14 @@ export default function HomeScreen() {
             }
 
             <View style={styles.bottomButtonContainer}>
-                <TouchableOpacity
+                <input
+                    type="date"
+                    value={isoDate}
+                    onChange={(e) => {
+                        setSelectedDate(new Date(e.target.value));
+                    }}
                     style={styles.bottomButtons}
-                    onPress={() => setShowPicker(true)}
-                >
-                    <Text style={styles.buttonText}>{selectedDate.toDateString()}</Text>
-                </TouchableOpacity>
+                />
 
                 {showStatsGraph
                     ?
@@ -81,14 +72,6 @@ export default function HomeScreen() {
                     <Text style={styles.buttonText}>Submit Selected Hand</Text>
                 </TouchableOpacity>
             </View>
-            {showPicker && (
-                <DateTimePicker
-                    value={selectedDate}
-                    mode="date"
-                    display='default'
-                    onChange={onChange}
-                />
-            )}
         </SafeAreaView >
     )
 }

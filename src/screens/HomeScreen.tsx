@@ -1,14 +1,17 @@
 import HandSelector from "../components/HandSelector";
+import HandStatsGraph from "../components/HandStatsGraph";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { DateTimePickerEvent } from "@react-native-community/datetimepicker"
+import { db } from "../db/database";
 
 export default function HomeScreen() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [selectedHand, setSelectedHand] = useState<string | null>(null);
+    const [showStatsGraph, setShowStatsGraph] = useState(false);
 
     const onChange = (event: DateTimePickerEvent, date?: Date) => {
         setShowPicker(false);
@@ -21,26 +24,64 @@ export default function HomeScreen() {
     const handleSubmitHand = () => {
         if (!selectedHand) return;
 
-        console.log("Submitting", selectedHand, selectedDate);
+        const isoDate = selectedDate.toISOString().split('T')[0];
+
+        db.runSync(
+            `INSERT INTO hands (hand, date) VALUES (?, ?)`,
+            [selectedHand, isoDate]
+        );
 
         setSelectedHand(null);
     }
 
+    const printHands = () => {
+        const rows = db.getAllSync(`SELECT * FROM hands`);
+        console.log(rows);
+    }
+
     return (
         <SafeAreaView style={styles.screen}>
-            <View style={styles.gridArea}>
-                <HandSelector
-                    selectedHand={selectedHand}
-                    onSelectHand={setSelectedHand}
-                />
-            </View>
+            {showStatsGraph
+                ?
+                <View style={styles.gridArea}>
+                    <HandStatsGraph selectedDate={selectedDate.toISOString().split('T')[0]} />
+                </View>
+                :
+                (
+                    <View style={styles.gridArea}>
+                        <HandSelector
+                            selectedHand={selectedHand}
+                            onSelectHand={setSelectedHand}
+                        />
+                    </View>
+                )
+            }
+
             <View style={styles.bottomButtonContainer}>
-                <TouchableOpacity style={styles.bottomButtons} onPress={() => setShowPicker(true)}>
+                <TouchableOpacity
+                    style={styles.bottomButtons}
+                    onPress={() => setShowPicker(true)}
+                >
                     <Text style={styles.buttonText}>{selectedDate.toDateString()}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButtons}>
-                    <Text style={styles.buttonText}>View Stats for selected day</Text>
-                </TouchableOpacity>
+
+                {showStatsGraph
+                    ?
+                    <TouchableOpacity
+                        style={styles.bottomButtons}
+                        onPress={() => setShowStatsGraph(false)}
+                    >
+                        <Text style={styles.buttonText}>Go back to hand selector</Text>
+                    </TouchableOpacity>
+                    :
+                    <TouchableOpacity
+                        style={styles.bottomButtons}
+                        onPress={() => setShowStatsGraph(true)}
+                    >
+                        <Text style={styles.buttonText}>View Stats for selected day</Text>
+                    </TouchableOpacity>
+                }
+
                 <TouchableOpacity
                     style={styles.bottomButtons}
                     disabled={!selectedHand}

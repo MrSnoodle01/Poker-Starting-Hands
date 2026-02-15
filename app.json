@@ -1,7 +1,12 @@
 {
   "expo": {
-    "name": "my-ts-app",
-    "slug": "my-ts-app",
+    "name": "Poker Hand Tracker",
+    "slug": "poker-hand-tracker",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,7 +29,10 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "shortName": "Poker",
+      "themeColor": "#2e86ff",
+      "backgroundColor": "#ffffff"
     },
     "plugins": [
       "@react-native-community/datetimepicker",

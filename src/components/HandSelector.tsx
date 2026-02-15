@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function HandSelector() {
+type Props = {
+    selectedHand: string | null;
+    onSelectHand: (hand: string) => void;
+}
+
+export default function HandSelector({ selectedHand, onSelectHand }: Props) {
     const buttons = ["AA", "AKs", "AQs", "AJs", "ATs", "A9s", "A8s", "A7s", "A6s", "A5s", "A4s", "A3s", "A2s",
         "AKo", "KK", "KQs", "KJs", "KTs", "K9s", "K8s", "K7s", "K6s", "K5s", "K4s", "K3s", "K2s",
         "AQo", "KQo", "QQ", "QJs", "QTs", "Q9s", "Q8s", "Q7s", "Q6s", "Q5s", "Q4s", "Q3s", "Q2s",
@@ -18,11 +23,21 @@ export default function HandSelector() {
 
     return (
         <View style={styles.container}>
-            {buttons.map((item) => (
-                <TouchableOpacity key={item} style={[styles.buttonFlex, { backgroundColor: getHandColor(item) }]}>
-                    <Text style={styles.buttonTextFlex}>{item}</Text>
-                </TouchableOpacity>
-            ))}
+            {buttons.map((item) => {
+                const isSelected = selectedHand === item;
+
+                return (
+                    <TouchableOpacity
+                        key={item}
+                        style={[styles.buttonFlex, { backgroundColor: getHandColor(item) }, isSelected && styles.selected]}
+                        onPress={() => onSelectHand(item)}
+                    >
+
+                        <Text style={styles.buttonTextFlex}>{item}</Text>
+                    </TouchableOpacity>
+                )
+            })}
+
         </View>
     );
 };
@@ -56,5 +71,8 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: 'white',
         fontWeight: '600',
+    },
+    selected: {
+        backgroundColor: '#FFD700',
     },
 });

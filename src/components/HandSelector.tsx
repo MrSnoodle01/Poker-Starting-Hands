@@ -19,13 +19,21 @@ export default function HandSelector() {
     return (
         <View style={styles.container}>
             {buttons.map((item) => (
-                <TouchableOpacity key={item} style={styles.buttonFlex}>
+                <TouchableOpacity key={item} style={[styles.buttonFlex, { backgroundColor: getHandColor(item) }]}>
                     <Text style={styles.buttonTextFlex}>{item}</Text>
                 </TouchableOpacity>
             ))}
         </View>
     );
 };
+
+function getHandColor(hand: string) {
+    if (hand.length === 2) return '#e74c3c';
+
+    if (hand.endsWith('s')) return '#27ae60';
+
+    return '#2980b9'
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -39,11 +47,14 @@ const styles = StyleSheet.create({
         height: `${100 / 13}%`,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#DDDDDD',
         marginVertical: 5,
         borderRadius: 5,
+        borderWidth: 0.5,
+        borderColor: '#000022',
     },
     buttonTextFlex: {
         fontSize: 10,
+        color: 'white',
+        fontWeight: '600',
     },
 });
